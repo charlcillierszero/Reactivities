@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
+var CorsPolicy = "CorsPolicy";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,7 +12,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+	options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy(CorsPolicy, policy => policy
+			.WithOrigins("http://localhost:3000")
+			.AllowAnyMethod()
+			.AllowAnyHeader()
+	);
 });
 
 var app = builder.Build();
@@ -19,11 +28,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(CorsPolicy);
+
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
@@ -34,14 +45,14 @@ var services = scope.ServiceProvider;
 
 try
 {
-    var context = services.GetRequiredService<DataContext>();
-    await context.Database.MigrateAsync();
-    await Seed.SeedData(context);
+	var context = services.GetRequiredService<DataContext>();
+	await context.Database.MigrateAsync();
+	await Seed.SeedData(context);
 }
 catch (Exception ex)
 {
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occured during DB migration");
+	var logger = services.GetRequiredService<ILogger<Program>>();
+	logger.LogError(ex, "An error occured during DB migration");
 }
 
 app.Run();
