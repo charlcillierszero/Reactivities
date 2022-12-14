@@ -4,7 +4,7 @@ import { Activity } from "../../../app/models/Activity";
 interface Props {
   activity: Activity;
   clearActivity: () => void;
-  onEditClick: () => void;
+  onEditClick: (activity: Activity) => void;
 }
 
 export default function ActivityDashboard({
@@ -24,7 +24,12 @@ export default function ActivityDashboard({
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths={2}>
-          <Button basic color="blue" content="Edit" onClick={onEditClick} />
+          <Button
+            basic
+            color="blue"
+            content="Edit"
+            onClick={() => onEditClick(activity)}
+          />
           <Button basic color="grey" content="Cancel" onClick={clearActivity} />
         </Button.Group>
       </Card.Content>

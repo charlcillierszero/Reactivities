@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
 import { Grid } from "semantic-ui-react";
 import { Activity } from "../../../app/models/Activity";
 import ActivityDetails from "../details/ActivityDetails";
@@ -7,89 +6,63 @@ import ActivityList from "./ActivityList";
 
 interface Props {
   activities: Activity[];
+  activity: Activity | undefined;
+  handleSelectActivity: (activity: Activity | undefined) => void;
+  handleClearActivity: () => void;
+  handleDeleteActivity: (id: string) => void;
   isCreate: boolean;
-  setIsCreate: (bool: boolean) => void;
-  createOrEditActivity: (activity: Activity) => void;
-  deleteActivity: (id: string) => void;
+  handleSubmitCreateActivity: (activity: Activity) => void;
+  handleCloseCreateActivity: () => void;
+  isEditing: boolean;
+  handleEditActivity: (activity: Activity) => void;
+  handleSubmitEditActivity: (activity: Activity) => void;
+  handleCloseEditActivity: () => void;
 }
 
 export default function ActivityDashboard({
   activities,
+  activity,
+  handleSelectActivity,
+  handleClearActivity,
+  handleDeleteActivity,
   isCreate,
-  setIsCreate,
-  createOrEditActivity,
-  deleteActivity,
+  handleSubmitCreateActivity,
+  handleCloseCreateActivity,
+  isEditing,
+  handleEditActivity,
+  handleSubmitEditActivity,
+  handleCloseEditActivity,
 }: Props) {
-  const [selectedActivity, setSelectedActivity] = useState<
-    Activity | undefined
-  >(undefined);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleCloseEditing = useCallback(() => {
-    setIsEditing(false);
-  }, []);
-  const handleClearActivity = useCallback(() => {
-    handleCloseEditing();
-    setSelectedActivity(undefined);
-  }, [handleCloseEditing]);
-
-  const handleCloseCreate = () => {
-    setIsCreate(false);
-  };
-  const onSubmitClickEdit = (activity: Activity) => {
-    handleClearActivity();
-    createOrEditActivity(activity);
-  };
-  const onSubmitClickCreate = (activity: Activity) => {
-    handleClearActivity();
-    createOrEditActivity(activity);
-  };
-  const handleSetSelectedActivity = (activity: Activity | undefined) => {
-    handleCloseEditing();
-    setSelectedActivity(activity);
-  };
-  const handleIsUpdating = () => {
-    setIsEditing(true);
-    setIsCreate(false);
-  };
-
-  useEffect(() => {
-    if (isCreate) {
-      handleCloseEditing();
-      handleClearActivity();
-    }
-  }, [isCreate, handleCloseEditing, handleClearActivity]);
-
   return (
     <Grid>
       <Grid.Column width={10}>
         <ActivityList
           activities={activities}
-          setSelectedActivity={handleSetSelectedActivity}
-          deleteActivity={deleteActivity}
+          setSelectedActivity={handleSelectActivity}
+          deleteActivity={handleDeleteActivity}
         />
       </Grid.Column>
       <Grid.Column width={6}>
-        {selectedActivity && !isEditing && (
+        {activity && !isEditing && (
           <ActivityDetails
-            activity={selectedActivity}
+            activity={activity}
             clearActivity={handleClearActivity}
-            onEditClick={handleIsUpdating}
+            onEditClick={handleEditActivity}
           />
         )}
         {isCreate && (
           <ActivityForm
             activity={undefined}
-            onSumbitClick={onSubmitClickCreate}
-            onCancelClick={handleCloseCreate}
+            onSumbitClick={handleSubmitCreateActivity}
+            onCancelClick={handleCloseCreateActivity}
             submitButtonContent={"Create"}
           />
         )}
         {isEditing && (
           <ActivityForm
-            activity={selectedActivity}
-            onSumbitClick={onSubmitClickEdit}
-            onCancelClick={handleCloseEditing}
+            activity={activity}
+            onSumbitClick={handleSubmitEditActivity}
+            onCancelClick={handleCloseEditActivity}
             submitButtonContent={"Update"}
           />
         )}
