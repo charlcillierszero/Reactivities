@@ -7,6 +7,7 @@ interface Props {
   onSumbitClick: (activity: Activity) => void;
   onCancelClick: () => void;
   submitButtonContent: string;
+  submitting: boolean;
 }
 
 export default function ActivityForm({
@@ -14,6 +15,7 @@ export default function ActivityForm({
   onSumbitClick,
   onCancelClick,
   submitButtonContent,
+  submitting,
 }: Props) {
   const initialState = selectedActivity ?? {
     id: "",
@@ -57,6 +59,7 @@ export default function ActivityForm({
         />
         <Form.Input
           placeholder="Date"
+          type="date"
           value={activity.date}
           name="date"
           onChange={handleInputChange}
@@ -78,12 +81,14 @@ export default function ActivityForm({
           positive
           type="submit"
           content={submitButtonContent}
+          loading={submitting}
         />
         <Button
           floated="right"
           type="button"
           content="Cancel"
           onClick={onCancelClick}
+          loading={submitting}
         />
       </Form>
     </Segment>

@@ -1,8 +1,9 @@
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "semantic-ui-react";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
+import services from "../api/services";
 import { Activity } from "../models/Activity";
+import LoadingComponent from "./LoadingComponent";
 import NavBar from "./NavBar";
 import { v4 as uuid } from "uuid";
 
@@ -11,6 +12,20 @@ function App() {
   const [activity, setActivity] = useState<Activity | undefined>(undefined);
   const [isCreate, setIsCreate] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    services.Activities.list()
+      .then((response) => {
+        response.forEach(
+          (activity) => (activity.date = activity.date.split("T")[0])
+        );
+        setActivities(response);
+        setLoading(false);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const handleSelectActivity = (activity: Activity | undefined) => {
     setActivity(activity);
@@ -32,12 +47,23 @@ function App() {
     setIsCreate(false);
   };
   const handleSubmitCreateActivity = (activity: Activity) => {
-    const activitiesCopy = [...activities];
+    setSubmitting(true);
     activity.id = uuid();
-    activitiesCopy.push(activity);
 
-    setActivities(activitiesCopy);
-    setIsCreate(false);
+    services.Activities.create(activity)
+      .then(() => {
+        const activitiesCopy = [...activities];
+        activitiesCopy.push(activity);
+        setActivities(activitiesCopy);
+        setActivity(activity);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setSubmitting(false);
+        setIsCreate(false);
+      });
   };
 
   const handleEditActivity = (activity: Activity) => {
@@ -49,25 +75,42 @@ function App() {
     setIsEditing(false);
   };
   const handleSubmitEditActivity = (activity: Activity) => {
-    const activitiesCopy = [...activities];
-    const activityIndex = activitiesCopy.findIndex((a) => a.id === activity.id);
-    activitiesCopy[activityIndex] = activity;
+    setSubmitting(true);
 
-    setActivities(activitiesCopy);
-    setIsEditing(false);
+    services.Activities.update(activity)
+      .then(() => {
+        const activitiesCopy = [...activities];
+        const activitiesIndex = activitiesCopy.findIndex(
+          (a) => a.id === activity.id
+        );
+        activitiesCopy[activitiesIndex] = activity;
+        setActivities(activitiesCopy);
+        setActivity(activity);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setSubmitting(false);
+        setIsEditing(false);
+      });
   };
-
-  useEffect(() => {
-    axios
-      .get<Activity[]>("http://localhost:5000/api/activities")
-      .then((response) => setActivities(response.data))
-      .catch((err) => console.error(err));
-  }, []);
 
   const handleDeleteActivity = (id: string) => {
-    const activitiesCopy = [...activities.filter((a) => a.id !== id)];
-    setActivities(activitiesCopy);
+    setSubmitting(true);
+    setActivity(undefined);
+    services.Activities.delete(id)
+      .then(() => {
+        const activitiesCopy = [...activities.filter((a) => a.id !== id)];
+        setActivities(activitiesCopy);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
+
+  if (loading) return <LoadingComponent content="Loading app" />;
 
   return (
     <>
@@ -86,6 +129,7 @@ function App() {
           handleEditActivity={handleEditActivity}
           handleSubmitEditActivity={handleSubmitEditActivity}
           handleCloseEditActivity={handleCloseEditActivity}
+          submitting={submitting}
         />
       </Container>
     </>

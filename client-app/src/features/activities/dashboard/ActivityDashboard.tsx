@@ -17,6 +17,7 @@ interface Props {
   handleEditActivity: (activity: Activity) => void;
   handleSubmitEditActivity: (activity: Activity) => void;
   handleCloseEditActivity: () => void;
+  submitting: boolean;
 }
 
 export default function ActivityDashboard({
@@ -32,6 +33,7 @@ export default function ActivityDashboard({
   handleEditActivity,
   handleSubmitEditActivity,
   handleCloseEditActivity,
+  submitting,
 }: Props) {
   return (
     <Grid>
@@ -40,6 +42,7 @@ export default function ActivityDashboard({
           activities={activities}
           setSelectedActivity={handleSelectActivity}
           deleteActivity={handleDeleteActivity}
+          submitting={submitting}
         />
       </Grid.Column>
       <Grid.Column width={6}>
@@ -56,6 +59,7 @@ export default function ActivityDashboard({
             onSumbitClick={handleSubmitCreateActivity}
             onCancelClick={handleCloseCreateActivity}
             submitButtonContent={"Create"}
+            submitting={submitting}
           />
         )}
         {isEditing && (
@@ -64,6 +68,7 @@ export default function ActivityDashboard({
             onSumbitClick={handleSubmitEditActivity}
             onCancelClick={handleCloseEditActivity}
             submitButtonContent={"Update"}
+            submitting={submitting}
           />
         )}
       </Grid.Column>
