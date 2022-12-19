@@ -1,10 +1,7 @@
-import { Button, Container, Menu } from "semantic-ui-react";
+import { Container, Menu } from "semantic-ui-react";
+import CreateNewActivityButton from "../models/CreateNewActivityButton";
 
-interface Props {
-  openCreateForm: () => void;
-}
-
-export default function NavBar({ openCreateForm }: Props) {
+const NavBar = () => {
   return (
     <Menu inverted fixed="top">
       <Container>
@@ -18,9 +15,11 @@ export default function NavBar({ openCreateForm }: Props) {
         </Menu.Item>
         <Menu.Item name="Activities" />
         <Menu.Item>
-          <Button positive content="Create Activity" onClick={openCreateForm} />
+          <CreateNewActivityButton />
         </Menu.Item>
       </Container>
     </Menu>
   );
-}
+};
+
+export default NavBar;

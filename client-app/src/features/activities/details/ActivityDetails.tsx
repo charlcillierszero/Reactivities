@@ -1,17 +1,26 @@
+import { observer } from "mobx-react-lite";
 import { Button, Card, Image } from "semantic-ui-react";
 import { Activity } from "../../../app/models/Activity";
+import { useStore } from "../../../app/stores/store";
 
-interface Props {
-  activity: Activity;
-  clearActivity: () => void;
-  onEditClick: (activity: Activity) => void;
-}
+const ActivityDashboard = () => {
+  const { activityStore } = useStore();
+  const { activity, setActivity, setIsCreate, isEditing, setIsEditing } =
+    activityStore;
 
-export default function ActivityDashboard({
-  activity,
-  clearActivity,
-  onEditClick,
-}: Props) {
+  const handleOnEditClick = (activity: Activity) => {
+    setIsCreate(false);
+    setIsEditing(true);
+    setActivity(activity);
+  };
+
+  const handleOnCancelClick = () => {
+    setIsCreate(false);
+    setIsEditing(false);
+    setActivity(undefined);
+  };
+
+  if (!activity || isEditing) return null;
   return (
     <Card fluid>
       <Image src={`/assets/categoryImages/${activity.category}.jpg`} />
@@ -28,11 +37,18 @@ export default function ActivityDashboard({
             basic
             color="blue"
             content="Edit"
-            onClick={() => onEditClick(activity)}
+            onClick={() => handleOnEditClick(activity)}
           />
-          <Button basic color="grey" content="Cancel" onClick={clearActivity} />
+          <Button
+            basic
+            color="grey"
+            content="Cancel"
+            onClick={handleOnCancelClick}
+          />
         </Button.Group>
       </Card.Content>
     </Card>
   );
-}
+};
+
+export default observer(ActivityDashboard);
