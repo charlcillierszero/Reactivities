@@ -1,45 +1,27 @@
 import { observer } from "mobx-react-lite";
-import services from "../../../app/api/services";
-import { Activity } from "../../../app/models/Activity";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 import { useStore } from "../../../app/stores/store";
 import ActivityForm from "./ActivityForm";
 
 const ActivityEditForm = () => {
   const { activityStore } = useStore();
-  const {
-    addOrUpdateActivityToRegistry,
-    setActivity,
-    isEditing,
-    setIsEditing,
-    setIsSubmitting,
-  } = activityStore;
+  const { activity, fetchActivity, updateActivity, loadingInitial } =
+    activityStore;
+  const { id } = useParams();
 
-  const handleCloseEditActivity = () => setIsEditing(false);
+  useEffect(() => {
+    if (id) fetchActivity(id);
+  }, [id, fetchActivity]);
 
-  const handleSubmitEditActivity = (activity: Activity) => {
-    setIsSubmitting(true);
-    services.Activities.update(activity)
-      .then(() => {
-        addOrUpdateActivityToRegistry(activity);
-        setActivity(activity);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {
-        setIsEditing(false);
-        setIsSubmitting(false);
-      });
-  };
-
+  if (loadingInitial) return <LoadingComponent content="Loading activity..." />;
   return (
-    <>
-      {isEditing && (
-        <ActivityForm
-          onSumbitClick={handleSubmitEditActivity}
-          onCancelClick={handleCloseEditActivity}
-          submitButtonContent={"Update"}
-        />
-      )}
-    </>
+    <ActivityForm
+      onSumbitClick={updateActivity}
+      submitButtonContent={"Update"}
+      selectedActivity={activity}
+    />
   );
 };
 

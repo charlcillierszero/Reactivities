@@ -1,26 +1,22 @@
 import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Button, Card, Image } from "semantic-ui-react";
-import { Activity } from "../../../app/models/Activity";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
+import { ACTIVITIES, EDIT_ACTIVITY } from "../../../app/router/paths";
 import { useStore } from "../../../app/stores/store";
 
 const ActivityDashboard = () => {
   const { activityStore } = useStore();
-  const { activity, setActivity, setIsCreate, isEditing, setIsEditing } =
-    activityStore;
+  const { activity, fetchActivity, loadingInitial } = activityStore;
+  const { id } = useParams();
 
-  const handleOnEditClick = (activity: Activity) => {
-    setIsCreate(false);
-    setIsEditing(true);
-    setActivity(activity);
-  };
+  useEffect(() => {
+    if (id) fetchActivity(id);
+  }, [id, fetchActivity]);
 
-  const handleOnCancelClick = () => {
-    setIsCreate(false);
-    setIsEditing(false);
-    setActivity(undefined);
-  };
-
-  if (!activity || isEditing) return null;
+  if (loadingInitial) return <LoadingComponent content="Loading activity..." />;
+  if (!activity) return null;
   return (
     <Card fluid>
       <Image src={`/assets/categoryImages/${activity.category}.jpg`} />
@@ -34,16 +30,18 @@ const ActivityDashboard = () => {
       <Card.Content extra>
         <Button.Group widths={2}>
           <Button
+            as={Link}
+            to={`/${ACTIVITIES}/${EDIT_ACTIVITY}/${id}`}
             basic
             color="blue"
             content="Edit"
-            onClick={() => handleOnEditClick(activity)}
           />
           <Button
+            as={Link}
+            to={`/${ACTIVITIES}`}
             basic
             color="grey"
             content="Cancel"
-            onClick={handleOnCancelClick}
           />
         </Button.Group>
       </Card.Content>

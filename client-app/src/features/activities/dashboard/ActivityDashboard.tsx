@@ -1,22 +1,28 @@
+import { observer } from "mobx-react-lite";
+import { useEffect } from "react";
 import { Grid } from "semantic-ui-react";
-import ActivityDetails from "../details/ActivityDetails";
-import ActivityCreateForm from "../form/ActivityCreateForm";
-import ActivityEditForm from "../form/ActivityEditForm";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
+import { useStore } from "../../../app/stores/store";
 import ActivityList from "./ActivityList";
 
 const ActivityDashboard = () => {
+  const { activityStore } = useStore();
+  const { fetchActivities, loadingInitial } = activityStore;
+
+  useEffect(() => fetchActivities(), [fetchActivities]);
+
+  if (loadingInitial) return <LoadingComponent content="Loading app" />;
+
   return (
     <Grid>
       <Grid.Column width={10}>
         <ActivityList />
       </Grid.Column>
       <Grid.Column width={6}>
-        <ActivityDetails />
-        <ActivityEditForm />
-        <ActivityCreateForm />
+        <h2>Activity Filters</h2>
       </Grid.Column>
     </Grid>
   );
 };
 
-export default ActivityDashboard;
+export default observer(ActivityDashboard);

@@ -7,3 +7,13 @@ export interface Activity {
   city: string;
   venue: string;
 }
+
+export const createEmptyActivity = (): Activity => ({
+  id: "",
+  title: "",
+  category: "",
+  description: "",
+  date: "",
+  city: "",
+  venue: "",
+});

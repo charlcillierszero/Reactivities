@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
-import App from "./app/layout/App";
+import { router } from "./app/router/Routes";
 import { store, StoreContext } from "./app/stores/store";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
@@ -10,7 +11,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <StoreContext.Provider value={store}>
-    <App />
+    <RouterProvider router={router} />
   </StoreContext.Provider>
 );
 

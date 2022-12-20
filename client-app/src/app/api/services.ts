@@ -1,19 +1,19 @@
 import axios, { AxiosResponse } from "axios";
 import { Activity } from "../models/Activity";
 
-const sleep = (delay: number) =>
-  new Promise((resolve) => setTimeout(resolve, delay));
-
 axios.defaults.baseURL = "http://localhost:5000/api";
 
-axios.interceptors.response.use((response) =>
-  sleep(1000)
-    .then(() => response)
-    .catch((error) => {
-      console.error(error);
-      return Promise.reject(error);
-    })
-);
+// const sleep = (delay: number) =>
+//   new Promise((resolve) => setTimeout(resolve, delay));
+
+// axios.interceptors.response.use((response) =>
+//   sleep(1000)
+//     .then(() => response)
+//     .catch((error) => {
+//       console.error(error);
+//       return Promise.reject(error);
+//     })
+// );
 
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 

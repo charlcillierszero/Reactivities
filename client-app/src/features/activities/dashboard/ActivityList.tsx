@@ -1,39 +1,18 @@
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button, Item, Label, Segment } from "semantic-ui-react";
-import services from "../../../app/api/services";
-import { Activity } from "../../../app/models/Activity";
+import { ACTIVITIES } from "../../../app/router/paths";
 import { useStore } from "../../../app/stores/store";
 
 const ActivityList = () => {
   const { activityStore } = useStore();
-  const {
-    activitiesByDate,
-    deleteActivityFromRegistry,
-    setActivity,
-    setIsCreate,
-    setIsEditing,
-    isSubmitting,
-    setIsSubmitting,
-  } = activityStore;
+  const { activitiesByDate, deleteActivity, isSubmitting } = activityStore;
   const [target, setTarget] = useState("");
-
-  const handleViewActivity = (activity: Activity) => {
-    setIsCreate(false);
-    setIsEditing(false);
-    setActivity(activity);
-  };
 
   const handleDeleteActivity = (id: string) => {
     setTarget(id);
-    setIsSubmitting(true);
-    services.Activities.delete(id)
-      .then(() => deleteActivityFromRegistry(id))
-      .catch((error) => console.error(error))
-      .finally(() => {
-        setIsSubmitting(false);
-        setActivity(undefined);
-      });
+    deleteActivity(id);
   };
 
   return (
@@ -52,10 +31,11 @@ const ActivityList = () => {
               </Item.Description>
               <Item.Extra>
                 <Button
+                  as={Link}
+                  to={`/${ACTIVITIES}/${activity.id}`}
                   floated="right"
                   content="View"
                   color="blue"
-                  onClick={() => handleViewActivity(activity)}
                 />
                 <Button
                   floated="right"
