@@ -20,6 +20,18 @@ export default class ActivityStore {
     );
   }
 
+  get groupedActivities() {
+    return Object.entries(
+      this.activitiesByDate.reduce((activities, activity) => {
+        const { date } = activity;
+        activities[date]
+          ? activities[date].push(activity)
+          : (activities[date] = [activity]);
+        return activities;
+      }, {} as { [key: string]: Activity[] })
+    );
+  }
+
   addOrUpdateActivityToRegistry = (activity: Activity) => {
     adjustActivityDate(activity);
     this.activityRegistry.set(activity.id, activity);

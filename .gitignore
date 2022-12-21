@@ -283,6 +283,9 @@ ServiceFabricBackup/
 # Microsoft Fakes
 FakesAssemblies/
 
+# SQLite
+**/*.db
+
 # GhostDoc plugin setting file
 *.GhostDoc.xml
 
