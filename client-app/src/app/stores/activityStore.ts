@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { v4 as uuid } from "uuid";
 import services from "../api/services";
-import { Activity } from "../models/Activity";
+import { Activity } from "../models/activity";
 import { adjustActivityDate } from "../utils/activityUtils";
 
 export default class ActivityStore {

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { Container, Menu } from "semantic-ui-react";
 import CreateNewActivityButton from "./CreateNewActivityButton";
-import { ACTIVITIES, HOME } from "../router/paths";
+import { ACTIVITIES, ERRORS, HOME } from "../router/paths";
 
 const NavBar = () => {
   return (
@@ -16,6 +16,7 @@ const NavBar = () => {
           Reactivities
         </Menu.Item>
         <Menu.Item as={NavLink} to={`/${ACTIVITIES}`} name="Activities" />
+        <Menu.Item as={NavLink} to={`/${ERRORS}`} name="Errors" />
         <Menu.Item>
           <CreateNewActivityButton />
         </Menu.Item>

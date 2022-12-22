@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Segment } from "semantic-ui-react";
-import { Activity, createEmptyActivity } from "../../../app/models/Activity";
+import { Activity, createEmptyActivity } from "../../../app/models/activity";
 import { ACTIVITIES } from "../../../app/router/paths";
 import { useStore } from "../../../app/stores/store";
 import { v4 as uuid } from "uuid";
