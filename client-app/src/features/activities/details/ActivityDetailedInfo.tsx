@@ -1,5 +1,6 @@
 import { Grid, Icon, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
+import { formatDateToDisplay } from "../../../app/utils/activityUtils";
 
 interface Props {
   activity: Activity;
@@ -24,7 +25,7 @@ const ActivityDetailedInfo = ({ activity }: Props) => {
             <Icon name="calendar" size="large" color="teal" />
           </Grid.Column>
           <Grid.Column width={15}>
-            <span>{activity.date}</span>
+            <span>{formatDateToDisplay(activity.date)}</span>
           </Grid.Column>
         </Grid>
       </Segment>

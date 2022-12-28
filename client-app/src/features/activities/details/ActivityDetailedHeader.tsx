@@ -1,5 +1,8 @@
+import { Link } from "react-router-dom";
 import { Button, Header, Image, Item, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
+import { EDIT_ACTIVITY } from "../../../app/router/paths";
+import { formatDateToDisplay } from "../../../app/utils/activityUtils";
 
 const activityImageStyle = {
   filter: "brightness(30%)",
@@ -36,7 +39,7 @@ const ActivityDetailedHeader = ({ activity }: Props) => {
                   content={activity.title}
                   style={{ color: "white" }}
                 />
-                <p>{activity.date}</p>
+                <p>{formatDateToDisplay(activity.date)}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>
@@ -48,7 +51,12 @@ const ActivityDetailedHeader = ({ activity }: Props) => {
       <Segment clearing attached="bottom">
         <Button color="teal">Join Activity</Button>
         <Button>Cancel attendance</Button>
-        <Button color="orange" floated="right">
+        <Button
+          as={Link}
+          to={`/${EDIT_ACTIVITY}/${activity.id}`}
+          color="orange"
+          floated="right"
+        >
           Manage Event
         </Button>
       </Segment>
