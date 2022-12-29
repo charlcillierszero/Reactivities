@@ -1,7 +1,7 @@
 import { Message, MessageItem, MessageList } from "semantic-ui-react";
 
 interface Props {
-  errors: string[];
+  errors: string[] | null;
 }
 
 const ValidationError = ({ errors }: Props) => {

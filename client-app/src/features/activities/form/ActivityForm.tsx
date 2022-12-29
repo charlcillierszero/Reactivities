@@ -1,4 +1,4 @@
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Header, Segment } from "semantic-ui-react";
 import * as Yup from "yup";
@@ -34,10 +34,13 @@ const ActivityForm = ({
     venue: Yup.string().required(),
   });
 
-  const handleOnSubmitClick = (activity: Activity) =>
-    onSumbitClick(activity).then(() =>
-      navigate(`/${ACTIVITIES}/${activity.id}`)
-    );
+  const handleOnSubmitClick = (
+    activity: Activity,
+    formikHelpers: FormikHelpers<Activity>
+  ) =>
+    onSumbitClick(activity)
+      .then(() => navigate(`/${ACTIVITIES}/${activity.id}`))
+      .finally(() => formikHelpers.setSubmitting(false));
 
   return (
     <Segment clearing>

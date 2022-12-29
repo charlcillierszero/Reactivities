@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { makeAutoObservable } from "mobx";
 import { v4 as uuid } from "uuid";
-import services from "../api/services";
+import ActivitiesService from "../api/activitiesService";
 import { Activity } from "../models/activity";
 import { adjustActivityDate } from "../utils/activityUtils";
 
@@ -49,7 +49,7 @@ export default class ActivityStore {
 
   fetchActivities = () => {
     this.setLoadingInitial(true);
-    services.Activities.list()
+    ActivitiesService.list()
       .then((activities) => {
         activities.forEach((activity) =>
           this.addOrUpdateActivityToRegistry(activity)
@@ -63,14 +63,14 @@ export default class ActivityStore {
     const activity = this.activityRegistry.get(id);
     if (activity) return this.setActivity(activity);
     this.setLoadingInitial(true);
-    services.Activities.get(id)
+    ActivitiesService.get(id)
       .then((activity) => this.setActivity(activity))
       .catch((error) => console.error(error))
       .finally(() => this.setLoadingInitial(false));
   };
 
   updateActivity = async (activity: Activity) => {
-    services.Activities.update(activity)
+    return ActivitiesService.update(activity)
       .then(() => {
         this.addOrUpdateActivityToRegistry(activity);
         this.setActivity(activity);
@@ -81,7 +81,7 @@ export default class ActivityStore {
 
   createActivity = async (activity: Activity) => {
     activity.id = uuid();
-    services.Activities.create(activity)
+    return ActivitiesService.create(activity)
       .then(() => {
         this.addOrUpdateActivityToRegistry(activity);
         this.setActivity(activity);
@@ -92,7 +92,7 @@ export default class ActivityStore {
 
   deleteActivity = (id: string) => {
     this.setIsSubmitting(true);
-    services.Activities.delete(id)
+    ActivitiesService.delete(id)
       .then(() => this.deleteActivityFromRegistry(id))
       .catch((error) => console.error(error))
       .finally(() => {

@@ -12,7 +12,8 @@ const ActivityDashboard = () => {
 
   useEffect(() => fetchActivities(), [fetchActivities]);
 
-  if (loadingInitial) return <LoadingComponent content="Loading app" />;
+  if (loadingInitial)
+    return <LoadingComponent content="Loading activities..." />;
 
   return (
     <Grid>
