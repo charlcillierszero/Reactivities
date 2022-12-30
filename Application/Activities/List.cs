@@ -1,30 +1,38 @@
 using Application.Core;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Persistence;
+using Persistence.Migrations;
 
 namespace Application.Activities
 {
-	public class List
-	{
-		public class Query : IRequest<Result<List<Activity>>> { }
+    public class List
+    {
+        public class Query : IRequest<Result<List<ActivityDto>>> { }
 
-		public class Handler : IRequestHandler<Query, Result<List<Activity>>>
-		{
-			private readonly DataContext _dataContext;
+        public class Handler : IRequestHandler<Query, Result<List<ActivityDto>>>
+        {
+            private readonly DataContext _dataContext;
+            private readonly IMapper _mapper;
 
-			public Handler(DataContext dataContext)
-			{
-				_dataContext = dataContext;
-			}
+            public Handler(DataContext dataContext, IMapper mapper)
+            {
+                _dataContext = dataContext;
+                _mapper = mapper;
+            }
 
-			public async Task<Result<List<Activity>>> Handle(Query request, CancellationToken cancellationToken)
-			{
-				var activities = await _dataContext.Activities.ToListAsync();
-				return Result<List<Activity>>.Success(activities);
-			}
-		}
-	}
+            public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
+            {
+                var activities = await _dataContext.Activities
+                    .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
+
+                return Result<List<ActivityDto>>.Success(activities);
+            }
+        }
+    }
 }
