@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite";
 import { Grid, Icon, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 import { formatDateToDisplay } from "../../../app/utils/activityUtils";
@@ -45,4 +46,4 @@ const ActivityDetailedInfo = ({ activity }: Props) => {
   );
 };
 
-export default ActivityDetailedInfo;
+export default observer(ActivityDetailedInfo);

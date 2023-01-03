@@ -13,6 +13,7 @@ const requests = {
   get: <T>(url: string = "") => axios.get<T>(url).then(responseBody),
   post: <T, U>(url: string = "", body: T) =>
     axios.post<U>(url, body).then(responseBody),
+  postNoBody: <U>(url: string = "") => axios.post<U>(url).then(responseBody),
   put: <T, U>(url: string = "", body: T) =>
     axios.put<U>(url, body).then(responseBody),
   delete: <T>(url: string = "") => axios.delete<T>(url).then(responseBody),

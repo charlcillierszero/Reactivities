@@ -7,11 +7,11 @@ import MySelectInput from "../../../app/common/form/MySelectInput";
 import MyTextArea from "../../../app/common/form/MyTextArea";
 import MyTextInput from "../../../app/common/form/MyTextInput";
 import { categoryOptions } from "../../../app/common/options/categoryOptions";
-import { Activity, createEmptyActivity } from "../../../app/models/activity";
+import { Activity, ActivityFormValues } from "../../../app/models/activity";
 import { ACTIVITIES } from "../../../app/router/paths";
 
 interface Props {
-  onSumbitClick: (activity: Activity) => Promise<void>;
+  onSumbitClick: (activity: ActivityFormValues) => Promise<Activity>;
   submitButtonContent: "Update" | "Create";
   selectedActivity?: Activity | undefined;
 }
@@ -23,7 +23,7 @@ const ActivityForm = ({
 }: Props) => {
   const navigate = useNavigate();
 
-  const activity = selectedActivity ? selectedActivity : createEmptyActivity();
+  const activity = new ActivityFormValues(selectedActivity);
 
   const validationSchema = Yup.object({
     title: Yup.string().required("The activity title is required"),
@@ -35,11 +35,11 @@ const ActivityForm = ({
   });
 
   const handleOnSubmitClick = (
-    activity: Activity,
-    formikHelpers: FormikHelpers<Activity>
+    activityFormValues: ActivityFormValues,
+    formikHelpers: FormikHelpers<ActivityFormValues>
   ) =>
-    onSumbitClick(activity)
-      .then(() => navigate(`/${ACTIVITIES}/${activity.id}`))
+    onSumbitClick(activityFormValues)
+      .then((activity) => navigate(`/${ACTIVITIES}/${activity.id}`))
       .finally(() => formikHelpers.setSubmitting(false));
 
   return (

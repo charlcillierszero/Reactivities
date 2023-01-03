@@ -9,6 +9,7 @@ const ActivitiesService = {
   update: (activity: Activity) =>
     requests.put<Activity, void>(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.delete<void>(`/activities/${id}`),
+  attend: (id: string) => requests.postNoBody<void>(`/activities/${id}/attend`),
 };
 
 export default ActivitiesService;

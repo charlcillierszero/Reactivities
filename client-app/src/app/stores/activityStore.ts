@@ -2,7 +2,8 @@ import { format } from "date-fns";
 import { makeAutoObservable } from "mobx";
 import { v4 as uuid } from "uuid";
 import ActivitiesService from "../api/activitiesService";
-import { Activity } from "../models/activity";
+import { Activity, ActivityFormValues } from "../models/activity";
+import { Profile } from "../models/profile";
 import { adjustActivityDate } from "../utils/activityUtils";
 import { store } from "./store";
 
@@ -34,7 +35,7 @@ export default class ActivityStore {
     );
   }
 
-  addOrUpdateActivityToRegistry = (activity: Activity) => {
+  private cleanActivity = (activity: Activity): Activity => {
     const user = store.userStore.user;
     if (user) {
       activity.isGoing = activity.attendees?.some(
@@ -44,14 +45,19 @@ export default class ActivityStore {
       activity.isHost = activity.host?.username === user.username;
     }
     adjustActivityDate(activity);
-    this.activityRegistry.set(activity.id, activity);
+    return activity;
+  };
+
+  addOrUpdateActivityToRegistry = (activity: Activity) => {
+    const cleanActivity = this.cleanActivity(activity);
+    this.activityRegistry.set(cleanActivity.id, cleanActivity);
   };
 
   deleteActivityFromRegistry = (id: string) => this.activityRegistry.delete(id);
 
   setActivity = (activity: Activity | undefined) => {
-    if (activity) adjustActivityDate(activity);
-    this.activity = activity;
+    const safeActivity = activity ? this.cleanActivity(activity) : activity;
+    this.activity = safeActivity;
   };
 
   setIsSubmitting = (isSubmitting: boolean) =>
@@ -82,25 +88,46 @@ export default class ActivityStore {
       .finally(() => this.setLoadingInitial(false));
   };
 
-  updateActivity = async (activity: Activity) => {
+  updateActivity = async (activityFormValues: ActivityFormValues) => {
+    const activity = this.activity!;
+    Object.assign(activity, activityFormValues);
     return ActivitiesService.update(activity)
       .then(() => {
         this.addOrUpdateActivityToRegistry(activity);
         this.setActivity(activity);
+        return Promise.resolve(activity);
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => {
+        console.error(error);
+        return Promise.reject(error);
+      });
   };
 
-  createActivity = async (activity: Activity) => {
+  createActivity = async (activityFormValues: ActivityFormValues) => {
+    const user = store.userStore.user;
+    const activity = new Activity(activityFormValues);
+
+    const attendee = new Profile(user!);
+    attendee.isHost = true;
+
     activity.id = uuid();
+    activity.isCancelled = false;
+    activity.isGoing = true;
+    activity.isHost = true;
+    activity.hostUsername = attendee.username;
+    activity.host = attendee;
+    activity.attendees = [attendee];
+
     return ActivitiesService.create(activity)
       .then(() => {
         this.addOrUpdateActivityToRegistry(activity);
         this.setActivity(activity);
+        return Promise.resolve(activity);
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => {
+        console.error(error);
+        return Promise.reject(error);
+      });
   };
 
   deleteActivity = (id: string) => {
@@ -112,5 +139,43 @@ export default class ActivityStore {
         this.setIsSubmitting(false);
         this.setActivity(undefined);
       });
+  };
+
+  updateAttendance = async () => {
+    this.setIsSubmitting(true);
+
+    const user = store.userStore.user!;
+    const activity = this.activity!;
+    if (activity.isGoing) {
+      activity.attendees = activity.attendees?.filter(
+        (attendee) => attendee.username !== user.username
+      );
+      activity.isGoing = false;
+    } else {
+      const attendee = new Profile(user);
+      activity.attendees?.push(attendee);
+      activity.isGoing = true;
+    }
+
+    ActivitiesService.attend(activity.id)
+      .then(() => {
+        this.addOrUpdateActivityToRegistry(activity);
+        this.setActivity(activity);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => this.setIsSubmitting(false));
+  };
+
+  cancelActivity = async () => {
+    this.setIsSubmitting(true);
+    const activity = this.activity!;
+    activity.isCancelled = !activity.isCancelled;
+    ActivitiesService.attend(activity.id)
+      .then(() => {
+        this.addOrUpdateActivityToRegistry(activity);
+        this.setActivity(activity);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => this.setIsSubmitting(false));
   };
 }

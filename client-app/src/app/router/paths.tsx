@@ -6,4 +6,4 @@ export const ERRORS = "errors";
 export const NOT_FOUND = "not-found";
 export const SERVER_ERROR = "server-error";
 export const LOGIN = "login";
-export const PROFILE = "profile";
+export const PROFILES = "profiles";

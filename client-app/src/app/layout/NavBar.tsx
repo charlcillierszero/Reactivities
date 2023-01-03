@@ -1,7 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { Container, Dropdown, Image, Menu } from "semantic-ui-react";
 import CreateNewActivityButton from "./CreateNewActivityButton";
-import { ACTIVITIES, ERRORS, HOME, PROFILE } from "../router/paths";
+import { ACTIVITIES, ERRORS, HOME, PROFILES } from "../router/paths";
 import { useStore } from "../stores/store";
 import { observer } from "mobx-react-lite";
 
@@ -36,7 +36,7 @@ const NavBar = () => {
             <Dropdown.Menu>
               <Dropdown.Item
                 as={Link}
-                to={`/${PROFILE}/${user?.username}`}
+                to={`/${PROFILES}/${user?.username}`}
                 text="My Profile"
                 icon="user"
               />

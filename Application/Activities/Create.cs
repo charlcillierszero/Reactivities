@@ -8,56 +8,56 @@ using Persistence;
 
 namespace Application.Activities
 {
-    public class Create
-    {
-        public class Command : IRequest<Result<Unit>>
-        {
-            public Activity Activity { get; set; }
-        }
+	public class Create
+	{
+		public class Command : IRequest<Result<Unit>>
+		{
+			public Activity Activity { get; set; }
+		}
 
-        public class CommandValidator : AbstractValidator<Command>
-        {
-            public CommandValidator()
-            {
-                RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
-            }
-        }
+		public class CommandValidator : AbstractValidator<Command>
+		{
+			public CommandValidator()
+			{
+				RuleFor(x => x.Activity).SetValidator(new ActivityValidator());
+			}
+		}
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
-        {
-            private readonly DataContext _context;
-            private readonly IUserAccessor _userAccessor;
+		public class Handler : IRequestHandler<Command, Result<Unit>>
+		{
+			private readonly DataContext _context;
+			private readonly IUserAccessor _userAccessor;
 
-            public Handler(DataContext context, IUserAccessor userAccessor)
-            {
-                _userAccessor = userAccessor;
-                _context = context;
-            }
+			public Handler(DataContext context, IUserAccessor userAccessor)
+			{
+				_userAccessor = userAccessor;
+				_context = context;
+			}
 
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
-            {
-                var user = await _context.Users.FirstOrDefaultAsync(user =>
-                    user.UserName == _userAccessor.GetUsername());
+			public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+			{
+				request.Activity.Attendees = new List<ActivityAttendee>();
 
-                if (user is null) return Result<Unit>.Failure("Failed to find host for activity");
+				var user = await _context.Users.FirstOrDefaultAsync(user =>
+					user.UserName == _userAccessor.GetUsername());
+				if (user is null) return Result<Unit>.Failure("Failed to find host for activity");
 
-                var attendee = new ActivityAttendee
-                {
-                    Activity = request.Activity,
-                    AppUser = user,
-                    IsHost = true,
-                };
+				var attendee = new ActivityAttendee
+				{
+					ActivityId = request.Activity.Id,
+					AppUserId = user.Id,
+					IsHost = true,
+				};
 
-                request.Activity.Attendees.Add(attendee);
+				request.Activity.Attendees.Add(attendee);
 
-                _context.Activities.Add(request.Activity);
+				_context.Activities.Add(request.Activity);
 
-                var result = await _context.SaveChangesAsync() > 0;
+				var result = await _context.SaveChangesAsync() > 0;
+				if (!result) return Result<Unit>.Failure("Failed to create activity");
 
-                if (!result) return Result<Unit>.Failure("Failed to create activity");
-
-                return Result<Unit>.Success(Unit.Value);
-            }
-        }
-    }
+				return Result<Unit>.Success(Unit.Value);
+			}
+		}
+	}
 }

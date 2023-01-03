@@ -1,7 +1,8 @@
+import { observer } from "mobx-react-lite";
 import { Link } from "react-router-dom";
 import { Image, Item, Label, List, Segment } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
-import { PROFILE } from "../../../app/router/paths";
+import { PROFILES } from "../../../app/router/paths";
 
 interface Props {
   activity: Activity;
@@ -38,7 +39,7 @@ const ActivityDetailedSidebar = ({ activity: { attendees } }: Props) => {
               <Image size="tiny" src={attendee.image || "/assets/user.png"} />
               <Item.Content verticalAlign="middle">
                 <Item.Header as="h3">
-                  <Link to={`/${PROFILE}/${attendee.username}`}>
+                  <Link to={`/${PROFILES}/${attendee.username}`}>
                     {attendee.displayName}
                   </Link>
                 </Item.Header>
@@ -52,4 +53,4 @@ const ActivityDetailedSidebar = ({ activity: { attendees } }: Props) => {
   );
 };
 
-export default ActivityDetailedSidebar;
+export default observer(ActivityDetailedSidebar);
