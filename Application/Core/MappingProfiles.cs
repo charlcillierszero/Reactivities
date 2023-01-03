@@ -24,7 +24,7 @@ namespace Application.Core
                     profile => profile.Username,
                     config => config.MapFrom(attendee => attendee.AppUser.UserName))
                 .ForMember(
-                    profile => profile.Displayname,
+                    profile => profile.DisplayName,
                     config => config.MapFrom(attendee => attendee.AppUser.DisplayName))
                 .ForMember(
                     profile => profile.Bio,

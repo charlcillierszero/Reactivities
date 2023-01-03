@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import ActivitiesService from "../api/activitiesService";
 import { Activity } from "../models/activity";
 import { adjustActivityDate } from "../utils/activityUtils";
+import { store } from "./store";
 
 export default class ActivityStore {
   activityRegistry: Map<string, Activity> = new Map<string, Activity>();
@@ -34,16 +35,28 @@ export default class ActivityStore {
   }
 
   addOrUpdateActivityToRegistry = (activity: Activity) => {
+    const user = store.userStore.user;
+    if (user) {
+      activity.isGoing = activity.attendees?.some(
+        (a) => a.username === user.username
+      );
+      activity.host = activity.attendees!.find((a) => a.isHost);
+      activity.isHost = activity.host?.username === user.username;
+    }
     adjustActivityDate(activity);
     this.activityRegistry.set(activity.id, activity);
   };
+
   deleteActivityFromRegistry = (id: string) => this.activityRegistry.delete(id);
+
   setActivity = (activity: Activity | undefined) => {
     if (activity) adjustActivityDate(activity);
     this.activity = activity;
   };
+
   setIsSubmitting = (isSubmitting: boolean) =>
     (this.isSubmitting = isSubmitting);
+
   setLoadingInitial = (loadingInitial: boolean) =>
     (this.loadingInitial = loadingInitial);
 
